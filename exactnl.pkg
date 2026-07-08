@@ -1,0 +1,16 @@
+v 3
+d exactnl: Exact likelihood correction for nested logit share-form estimation
+d
+d Authors: Lisa M. George and Matthew J. Baker
+d
+d exactnl implements the likelihood correction for the Berry share-form
+d nested logit estimator with variable choice sets.
+d
+d If you use this command, please cite:
+d Baker, Matthew J. and Lisa M. George. Demand Estimation with Variable Choice Sets:
+d A Likelihood Correction for BLP Models. Working paper.
+d
+f exactnl.ado
+f exactnl.sthlp
+f exactnl_example.do
+f exactnl_certification.do
