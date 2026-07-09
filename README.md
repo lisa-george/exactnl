@@ -8,22 +8,27 @@ demand model by exact maximum likelihood.
 The share-form nested logit is estimated on a transformed dependent
 variable: observed shares are mapped to the log share-ratio
 ln(s_j) - ln(s_0) following Berry (1994). A likelihood written for the
-transformed variable must include the Jacobian of that transformation, and
-in the nested logit the Jacobian depends on the nesting parameter and the
-nest size: each nest of J products contributes (J - 1) * ln(1 - sigma) to
-the log likelihood. Standard practice estimates the share equation as a
-linear regression and omits this term. When every market has the same
-number of products the term is constant and its omission is harmless. When
-choice sets vary across markets, omission biases the nesting parameter,
-and the common remedy, instrumenting the within-nest share with product
-counts, fails whenever product counts also enter demand directly.
+transformed variable must include the Jacobian of that transformation.  In
+the nested logit, the Jacobian depends on the choice set and the nesting
+parameter.  Each  nest of J products contributes (J - 1) * ln(1 - sigma) to
+the log likelihood.  Applied work omits this term. The omission has no effect
+when choice sets are fixed across markets.  But when choice sets vary, omitting the Jacobian 
+biases estimates of within-group substitution, which feed directly into
+elasticities, markups, and welfare calculations.
 
-exactnl maximizes the exact likelihood instead. It concentrates the linear
+Guides for structural demand estimation recommend instrumenting the
+within-nest share with counts of rival products. Under the exact
+likelihood, count instruments are not valid because the same product-count variation that makes them
+strong instruments enters the estimating objective directly. However with the corrected likelihood, instruments for the within-nest share are not needed because the dependence between the within-nest share and the structural
+error is exactly what the Jacobian accounts for.
+
+exactnl maximizes the exact likelihood. It concentrates the linear
 parameters out by fixed-effect partialling, profiles the likelihood over
-the nesting parameters, and recovers the remaining coefficients by a final
-regression at the optimum. Price endogeneity is handled by a control
-function. No instrument for the within-nest share is required, and a
-product-count term in mean utility can be estimated directly.
+the nesting parameters, and recovers the remaining coefficients at the
+optimum. Price endogeneity is handled by a control function. A
+product-count term in mean utility can be estimated directly, so crowding
+of the product space (Ackerberg and Rysman 2005) is estimable rather than
+assumed away.
 
 See `help exactnl` after installation for syntax, options, and stored
 results, and `exactnl_example.do` for worked examples.
