@@ -1,10 +1,10 @@
 *! version 1.0.0  09jul2026  Baker & George
-*! exactnl : exact-likelihood nested logit with the (J-1)ln(1-sigma) Jacobian
-*!           correction, FE absorption, and control-function price IV.
-*! Estimation core extracted from the corrected-likelihood two-sigma do-file
-*! behind Table 4 of Baker & George (MA nesting paper); see exactnl.sthlp.
+*! exactnl : exact maximum likelihood estimation of the share-form nested
+*!           logit, with FE absorption and a control-function price IV.
+*! Companion command to Baker & George, "Demand Estimation with Variable
+*! Choice Sets: A Likelihood Correction for Nested Logit"; see exactnl.sthlp.
 *
-* Model (per market m, nest g, plan j):
+* Model (per market m, nest g, product j):
 *   ln(s_j) - ln(s_0) = X'beta - alpha*price + sigma_g * ln(s_{j|g,m})
 *                       [ + tau * ln(J_gm) | + tau_g * ln(J_gm) ] + xi
 * Price is handled by a control function: v_hat = residual of price on the
