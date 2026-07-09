@@ -1,38 +1,29 @@
 # exactnl
 
-exactnl is a Stata command that estimates the share-form nested logit demand
-model by exact maximum likelihood.
+exactnl is a Stata command that estimates the share-form nested logit
+demand model by exact maximum likelihood.
 
 ## What it does
 
-The Berry (1994) inversion turns nested logit demand into a linear equation:
-the log share-ratio regressed on characteristics, price, and the within-nest
-log share. The exact likelihood of this equation contains a Jacobian term
-from the share transformation: each nest of J products contributes
-(J - 1) * ln(1 - sigma) to the log likelihood. Standard practice estimates
-the linear equation by IV and discards this term. exactnl includes it. The
-command concentrates the linear parameters out by fixed-effect partialling,
-maximizes the profile likelihood over the nesting parameters, and recovers
-the remaining coefficients by a final regression at the optimum. Price
-endogeneity is handled by a control function. No instrument for the
-within-nest share is required.
+The share-form nested logit is estimated on a transformed dependent
+variable: observed shares are mapped to the log share-ratio
+ln(s_j) - ln(s_0) following Berry (1994). A likelihood written for the
+transformed variable must include the Jacobian of that transformation, and
+in the nested logit the Jacobian depends on the nesting parameter and the
+nest size: each nest of J products contributes (J - 1) * ln(1 - sigma) to
+the log likelihood. Standard practice estimates the share equation as a
+linear regression and omits this term. When every market has the same
+number of products the term is constant and its omission is harmless. When
+choice sets vary across markets, omission biases the nesting parameter,
+and the common remedy, instrumenting the within-nest share with product
+counts, fails whenever product counts also enter demand directly.
 
-## When the correction matters
-
-If every market has the same number of products, the Jacobian term is a
-constant and omitting it is harmless: exactnl and the standard estimator
-agree.
-
-If choice sets vary across markets, the term varies with the nesting
-parameter and its omission biases the estimate. The common remedy in
-applied work is to instrument the within-nest share with the count of
-products in the nest. This works when product counts affect only how shares
-divide within a nest. It fails when product counts also enter demand
-directly, as when products crowd a congested product space (Ackerberg and
-Rysman 2005): the count then belongs in the demand equation and cannot be
-excluded. exactnl requires no share instrument, so it remains valid in
-exactly these settings, and it permits a product-count term in mean utility
-so that crowding can be estimated rather than assumed away.
+exactnl maximizes the exact likelihood instead. It concentrates the linear
+parameters out by fixed-effect partialling, profiles the likelihood over
+the nesting parameters, and recovers the remaining coefficients by a final
+regression at the optimum. Price endogeneity is handled by a control
+function. No instrument for the within-nest share is required, and a
+product-count term in mean utility can be estimated directly.
 
 See `help exactnl` after installation for syntax, options, and stored
 results, and `exactnl_example.do` for worked examples.
@@ -51,8 +42,9 @@ recovers the true nesting parameter. No confidential data required.
 
 If you use this command, please cite:
 
-Baker, Matthew J. and Lisa M. George. "Maximum Likelihood Estimation of the
-Share-Form Nested Multinomial Logit Model." Working paper. [SSRN link]
+Baker, Matthew J. and Lisa M. George. "Demand Estimation with Variable
+Choice Sets: A Likelihood Correction for Nested Logit." Working paper.
+[SSRN link]
 
 ## Issues
 
