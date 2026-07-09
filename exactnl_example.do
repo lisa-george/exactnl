@@ -63,28 +63,13 @@ exactnl y x (p = z), nest(nestid) market(mkt) share(s_j) outside(s_0) ///
     crowding("lnJ") cluster(mkt)
 
 *==============================================================================
-* SECTION B -- the paper's Medicare Advantage application (reference only)
-* Requires the confidential MA estimation sample; edit the path to run.
+* SECTION B -- full real-data syntax: the specification from the paper's
+* Medicare Advantage application (Baker and George, working paper).
+* Requires the paper's estimation sample; shown for syntax reference.
 *==============================================================================
 /*
-use "PATH/TO/ma_nml_estimation_sample.dta", clear
-gen byte gap_coverage = (extragap=="Y" | extragap=="Yes")
-keep if share_flag==0
-
-* Preferred specification: two nests (HMO/PPO), common crowding term,
-* county+year fixed effects, price instrumented by the CMS benchmark,
-* county-clustered SEs. Reproduces sigma_HMO=0.136, sigma_PPO=0.117,
-* tau=-0.052, alpha=-0.0336.
 exactnl depvar_logit ddrugdeduct gap_coverage ///
         (premium_partc = benchmark_no_bonus), ///
     nest(plan_group) market(fipscode year) absorb(fipscode year) ///
     wnshare(ln_within_nest_share) crowding("lnJ") cluster(fipscode)
-
-* Uncorrected comparison on the same specification.
-exactnl depvar_logit ddrugdeduct gap_coverage ///
-        (premium_partc = benchmark_no_bonus), ///
-    nest(plan_group) market(fipscode year) absorb(fipscode year) ///
-    wnshare(ln_within_nest_share) crowding("lnJ") cluster(fipscode) noJACobian
 */
-
-display _n(2) "exactnl_example.do complete."
