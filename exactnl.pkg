@@ -1,16 +1,21 @@
 v 3
-d exactnl: Exact likelihood correction for nested logit share-form estimation
+d exactnl: Exact maximum likelihood estimation of the share-form nested logit
 d
 d Authors: Matthew J. Baker and Lisa M. George
 d
-d exactnl implements the exact-likelihood correction for the Berry share-form
-d nested logit estimator with variable choice sets, adding the
-d (J-1)ln(1-sigma) Jacobian term that the linear IV regression discards.
-d Supports fixed-effect absorption and a control-function price instrument.
+d exactnl estimates the share-form nested logit demand model by exact
+d maximum likelihood. The likelihood of the Berry (1994) log share-ratio
+d includes a Jacobian term, (J-1)ln(1-sigma) per nest, that applied work
+d omits. The omission has no effect when choice sets are fixed across
+d markets but biases within-group substitution estimates when choice sets
+d vary. exactnl includes the term, requires no instrument for the
+d within-nest share, and supports fixed-effect absorption, a
+d control-function price instrument, and a direct product-count
+d (crowding) term in mean utility.
 d
 d If you use this command, please cite:
 d Baker, Matthew J. and Lisa M. George. Demand Estimation with Variable
-d Choice Sets: A Likelihood Correction for BLP Models. Working paper.
+d Choice Sets: A Likelihood Correction for Nested Logit. Working paper.
 d
 d Distribution-Date: 20260710
 d
