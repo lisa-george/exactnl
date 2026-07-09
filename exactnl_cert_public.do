@@ -14,16 +14,18 @@
 * estimation-sample estimates and the noJACobian comparison) is kept private in
 * exactnl_cert.do and requires the confidential estimation sample.
 *
-* Environment note: ivreghdfe is broken on this machine (stale ranktest), so
-* exactnl performs its control-function first stage with reghdfe directly; this
-* simulated check uses raw shares and no instrument, so it is unaffected.
+* This check uses raw shares and no price instrument, so it requires only
+* exactnl itself plus reghdfe/ftools.
 *==============================================================================
 version 17
 clear all
 set more off
 
-* ---- paths (edit if the package moves) ---------------------------------------
-global EXACTNL_HOME "D:/Dropbox/NML/nml_lisa_matt_shared/exactnl"
+* ---- paths ---------------------------------------------------------------
+* If exactnl is installed (net install exactnl), no path setup is needed and
+* results are written to the current working directory. If running from a
+* cloned copy of the repository, set EXACTNL_HOME to the package folder.
+global EXACTNL_HOME "."
 adopath ++ "$EXACTNL_HOME"
 
 * results holder
