@@ -13,8 +13,9 @@
 {title:Title}
 
 {phang}
-{bf:exactnl} {hline 2} Exact-likelihood nested logit with the (J-1)ln(1-sigma)
-Jacobian correction, fixed-effect absorption, and control-function price IV
+{bf:exactnl} {hline 2} Exact maximum likelihood estimation of the share-form
+nested logit, with fixed-effect absorption and a control-function price
+instrument
 
 {marker syntax}{...}
 {title:Syntax}
@@ -30,31 +31,31 @@ Jacobian correction, fixed-effect absorption, and control-function price IV
 {syntab:Model (required)}
 {synopt:{opth nest(varname)}}categorical variable defining the nests (1..G per
 market); one nesting parameter sigma is estimated per {it:level} of {it:nest()}{p_end}
-{synopt:{opth market(varlist)}}market identifiers (e.g. {cmd:fipscode year}); a
+{synopt:{opth market(varlist)}}market identifiers (e.g. {cmd:county year}); a
 nest is a {it:market x nest()} cell{p_end}
 
 {syntab:Within-nest shares (supply ONE of the two)}
-{synopt:{opth share(varname)}}plan-level market share s_j; combined with
+{synopt:{opth share(varname)}}product-level market share s_j; combined with
 {cmd:outside()} the command builds ln s_(j|g) and validates the shares{p_end}
 {synopt:{opth out:side(varname)}}outside-good share s_0 (required with
 {cmd:share()}){p_end}
 {synopt:{opth wns:hare(varname)}}precomputed within-nest log share ln s_(j|g),
-for data that do not carry raw shares (the MA estimation sample){p_end}
+for data that do not carry raw shares{p_end}
 
 {syntab:Specification}
 {synopt:{opth absorb(varlist)}}fixed effects to absorb, reghdfe-style (e.g.
-{cmd:fipscode year}){p_end}
+{cmd:county year}){p_end}
 {synopt:{opt crow:ding(str)}}{cmd:lnJ} adds tau*ln(J_gm) to mean utility with a
 common tau; {cmd:lnJ, bynest} adds a nest-specific tau_g{p_end}
-{synopt:{opt noJAC:obian}}omit the Jacobian correction (for comparison; prints a
-warning that sigma is biased upward){p_end}
+{synopt:{opt noJAC:obian}}omit the Jacobian term (for comparison; prints a
+warning that sigma is biased upward when choice sets vary){p_end}
 {synopt:{opt sigma0(numlist)}}starting values for the golden-section refinement
 when G>=3 (default 0.2 per nest){p_end}
 
 {syntab:Inference}
 {synopt:{opth cluster(varname)}}cluster-robust (sandwich) SEs for the linear
 parameters{p_end}
-{synopt:{opt boot:strap(reps)}}county block-bootstrap SEs for sigma_g, tau and
+{synopt:{opt boot:strap(reps)}}cluster block-bootstrap SEs for sigma_g, tau and
 the linear parameters; use with {cmd:cluster()}{p_end}
 
 {syntab:Numerical}
@@ -72,19 +73,18 @@ to treat all regressors as exogenous.
 {title:Description}
 
 {pstd}
-{cmd:exactnl} estimates a two-level nested logit demand model by the exact
-(corrected) profile-likelihood method rather than by the Berry (1994) linear IV
-regression of the log share-ratio on the within-nest log share.  Berry's
-instrumental-variables estimator treats ln s_(j|g) as a single endogenous
-regressor and instruments it with the count of rival plans in the nest.  When
-nest size is correlated with the unobserved mean utility (congestion, crowding),
-that count instrument is invalid and the IV estimate of the nesting parameter is
-biased.  The likelihood estimator writes the log likelihood of the observed
-shares directly and includes the change-of-variables Jacobian of the nested-logit
-share map.  For nest g in market m containing J_gm plans, that Jacobian
-contributes {bf:(J_gm - 1) ln(1 - sigma_g)} to the log likelihood, which is the
-term the linear IV regression discards.  Concentrating the linear parameters out
-by fixed-effect partialling, the profile log likelihood is
+{cmd:exactnl} estimates the share-form nested logit demand model by exact
+maximum likelihood.  The model is estimated on a transformed dependent
+variable: observed shares are mapped to the log share-ratio
+ln(s_j) - ln(s_0) following Berry (1994).  A likelihood written for the
+transformed variable must include the Jacobian of that transformation, and in
+the nested logit the Jacobian depends on the choice set and the nesting
+parameter: each nest of J_gm products contributes
+{bf:(J_gm - 1) ln(1 - sigma_g)} to the log likelihood.  Applied work omits this
+term.  The omission has no effect when choice sets are fixed across markets,
+but when choice sets vary it biases estimates of within-group substitution.
+{cmd:exactnl} includes the term.  Concentrating the linear parameters out by
+fixed-effect partialling, the profile log likelihood is
 
 {p 8 8 2}
 LL(sigma) = -N/2 ln(SSR(sigma)/N) + sum_g [ sum_m (J_gm - 1) ] ln(1 - sigma_g),
@@ -92,30 +92,38 @@ LL(sigma) = -N/2 ln(SSR(sigma)/N) + sum_g [ sum_m (J_gm - 1) ] ln(1 - sigma_g),
 {pstd}
 where SSR(sigma) is a quadratic form in sigma built once from the FE-partialled
 residuals of {it:depvar} and of the within-nest log shares interacted with each
-nest.  {cmd:exactnl} maximises LL over sigma in [lo,hi]^G (an exhaustive grid for
-G<=2, matching the paper's implementation exactly; coordinate golden-section
-ascent for G>=3), then recovers the linear parameters (alpha on price, beta on
-{it:indepvars}, and tau on the crowding term) by one final FE regression at the
-optimum.  This reproduces the corrected-likelihood column of Table 4 of the MA
-nesting paper.
+nest.  {cmd:exactnl} maximises LL over sigma in [lo,hi]^G (an exhaustive grid
+for G<=2; coordinate golden-section ascent for G>=3), then recovers the linear
+parameters (alpha on price, beta on {it:indepvars}, and tau on the crowding
+term) by one final FE regression at the optimum.
 
 {pstd}
-Price endogeneity is handled by a control function: the first stage regresses
-{it:endogvar} on the excluded instrument(s), the exogenous regressors, the
-crowding term and the absorbed fixed effects (via {help reghdfe}), and the
-first-stage residual is added to the structural equation.  {cmd:reghdfe} is
-invoked directly for the first stage (not {cmd:ivreghdfe}) so that the residual
-is available as a generated regressor.  Standard errors on the linear parameters
-are the {cmd:cluster()} sandwich from the final regression; the sigma_g standard
-errors are profile-curvature (observed-information) approximations, and a cluster
-block bootstrap ({cmd:bootstrap()}) is recommended for inference on sigma_g.  The
-command also reports the boundary likelihood-ratio test of H0: all sigma_g = 0
-against the one-sided alternative.  The printed 5% critical value is the
-Kodde-Palm (1986) least-favourable upper bound (2.71 for G=1, 5.14 for G=2),
-which is valid regardless of the dependence among the sigma_g estimates; the
-exact chi-bar-squared mixture quantile (valid under independence of the sigma_g
-estimates) is stored in {cmd:e(LR_crit5_exact)} (see
-{help exactnl##results:Stored results}).
+No instrument for the within-nest share is used.  Applied work commonly
+instruments ln s_(j|g) with counts of rival products in the nest; under the
+exact likelihood such instruments are not needed, because the dependence
+between the within-nest share and the structural error is exactly what the
+Jacobian accounts for, and they are not valid, because the same product-count
+variation that makes them strong enters the estimating objective directly.
+Because no share instrument is required, a product-count (crowding) term in
+mean utility can be estimated directly via {cmd:crowding()}, in the spirit of
+Ackerberg and Rysman (2005).
+
+{pstd}
+Price endogeneity is a separate matter and still requires instruments.  It is
+handled by a control function: the first stage regresses {it:endogvar} on the
+excluded instrument(s), the exogenous regressors, the crowding term and the
+absorbed fixed effects (via {help reghdfe}), and the first-stage residual is
+added to the structural equation.  Standard errors on the linear parameters
+are the {cmd:cluster()} sandwich from the final regression; the sigma_g
+standard errors are profile-curvature (observed-information) approximations,
+and a cluster block bootstrap ({cmd:bootstrap()}) is recommended for inference
+on sigma_g.  The command also reports the boundary likelihood-ratio test of
+H0: all sigma_g = 0 against the one-sided alternative.  The printed 5%
+critical value is the Kodde-Palm (1986) least-favourable upper bound (2.71 for
+G=1, 5.14 for G=2), which is valid regardless of the dependence among the
+sigma_g estimates; the exact chi-bar-squared mixture quantile (valid under
+independence of the sigma_g estimates) is stored in {cmd:e(LR_crit5_exact)}
+(see {help exactnl##results:Stored results}).
 
 {marker options}{...}
 {title:Options}
@@ -130,16 +138,15 @@ is a {it:market() x nest()} cell.
 shares are computed within {it:market() x nest()} cells.
 
 {phang}
-{opth share(varname)} / {opth outside(varname)} supply the raw plan share s_j and
-outside share s_0.  The command builds ln s_(j|g) = ln(s_j) - ln(sum of s_j in the
-nest) and validates that shares lie in (0,1) and that within-market share totals
-do not exceed 1.
+{opth share(varname)} / {opth outside(varname)} supply the raw product share s_j
+and outside share s_0.  The command builds ln s_(j|g) = ln(s_j) - ln(sum of s_j
+in the nest) and validates that shares lie in (0,1) and that within-market share
+totals do not exceed 1.
 
 {phang}
 {opth wnshare(varname)} supplies a precomputed within-nest log share ln s_(j|g)
-directly.  Use this for data (such as the MA estimation sample) that store the
-within-nest log share but not the raw shares.  Exactly one of {cmd:wnshare()} or
-{cmd:share()}+{cmd:outside()} must be given.
+directly, for data that store the within-nest log share but not the raw shares.
+Exactly one of {cmd:wnshare()} or {cmd:share()}+{cmd:outside()} must be given.
 
 {phang}
 {opth absorb(varlist)} lists the fixed effects to absorb ({help reghdfe} syntax).
@@ -151,8 +158,8 @@ within-nest log share but not the raw shares.  Exactly one of {cmd:wnshare()} or
 
 {phang}
 {opt noJACobian} drops the (J_gm-1)ln(1-sigma_g) term, reducing the objective to
-the Gaussian sum of squares.  The resulting sigma_g are the uncorrected
-(upward-biased) estimates; a warning is printed.
+the Gaussian sum of squares.  When choice sets vary across markets the resulting
+sigma_g are biased upward; a warning is printed.
 
 {phang}
 {opt sigma0(numlist)} sets starting values for the G>=3 golden-section refinement.
@@ -161,11 +168,10 @@ the Gaussian sum of squares.  The resulting sigma_g are the uncorrected
 {opth cluster(varname)} requests cluster-robust SEs for the linear parameters.
 
 {phang}
-{opt bootstrap(reps)} runs a county (cluster) block bootstrap of the full
-estimator, resampling clusters, rebuilding the nest counts on the bootstrap
-replica id, and refitting; it reports bootstrap SEs for sigma_g, tau and the
-linear parameters.  Requires {cmd:cluster()} to be the leading {cmd:market()}
-variable.
+{opt bootstrap(reps)} runs a cluster block bootstrap of the full estimator,
+resampling clusters, rebuilding the nest counts on the bootstrap replica id, and
+refitting; it reports bootstrap SEs for sigma_g, tau and the linear parameters.
+Requires {cmd:cluster()} to be the leading {cmd:market()} variable.
 
 {phang}
 {opt grid(lo hi step)} sets the profile grid (default {cmd:0.001 0.999 0.001}).
@@ -206,26 +212,25 @@ profile curvature for the sigma block){p_end}
 {marker examples}{...}
 {title:Examples}
 
-{pstd}MA application, preferred spec (two nests HMO/PPO, common crowding tau,
-county+year FE, county-clustered SEs, price instrumented by the CMS benchmark):{p_end}
+{pstd}From raw shares, single nest, all regressors exogenous:{p_end}
 
-{phang2}{cmd:. gen byte gap_coverage = (extragap=="Y")}{p_end}
-{phang2}{cmd:. keep if share_flag==0}{p_end}
-{phang2}{cmd:. exactnl depvar_logit ddrugdeduct gap_coverage (premium_partc = benchmark_no_bonus), ///}{p_end}
-{phang2}{cmd:      nest(plan_group) market(fipscode year) absorb(fipscode year) ///}{p_end}
-{phang2}{cmd:      wnshare(ln_within_nest_share) crowding("lnJ") cluster(fipscode)}{p_end}
+{phang2}{cmd:. exactnl y x1 x2, nest(nestid) market(mkt) share(s_j) outside(s_0)}{p_end}
 
-{pstd}Uncorrected (Berry-style) sigma for comparison:{p_end}
+{pstd}Two nests, fixed effects, price instrumented by a cost shifter via
+control function, a common crowding term, and clustered SEs:{p_end}
 
-{phang2}{cmd:. exactnl depvar_logit ddrugdeduct gap_coverage (premium_partc = benchmark_no_bonus), ///}{p_end}
-{phang2}{cmd:      nest(plan_group) market(fipscode year) absorb(fipscode year) ///}{p_end}
-{phang2}{cmd:      wnshare(ln_within_nest_share) crowding("lnJ") cluster(fipscode) noJACobian}{p_end}
+{phang2}{cmd:. exactnl y x1 x2 (price = costshifter), nest(nestid) market(mkt year) ///}{p_end}
+{phang2}{cmd:      absorb(mkt year) share(s_j) outside(s_0) crowding("lnJ") cluster(mkt)}{p_end}
 
-{pstd}From raw shares, single nest, no price instrument:{p_end}
+{pstd}Uncorrected estimates for comparison (Jacobian dropped):{p_end}
 
-{phang2}{cmd:. exactnl y x1 x2, nest(one) market(mkt) share(s_j) outside(s_0)}{p_end}
+{phang2}{cmd:. exactnl y x1 x2 (price = costshifter), nest(nestid) market(mkt year) ///}{p_end}
+{phang2}{cmd:      absorb(mkt year) share(s_j) outside(s_0) crowding("lnJ") cluster(mkt) noJACobian}{p_end}
 
-{pstd}See {cmd:exactnl_example.do} for a runnable script.{p_end}
+{pstd}For data that carry a precomputed within-nest log share instead of raw
+shares, replace {cmd:share()}+{cmd:outside()} with {cmd:wnshare()}.  See
+{cmd:exactnl_example.do} for a runnable script, including the specification
+used in the paper's Medicare Advantage application.{p_end}
 
 {marker remarks}{...}
 {title:Remarks}
@@ -239,8 +244,8 @@ feature requests there.
 {title:Authors}
 
 {pstd}
-Packaged from the corrected-likelihood estimation core of the Medicare Advantage
-nesting project (Baker and George).  Correspondence: lisa.m.george@gmail.com.
+Matthew J. Baker and Lisa M. George, Hunter College and the Graduate Center,
+CUNY.
 
 {pstd}
 Website: {browse "https://github.com/lisa-george/exactnl"}
@@ -249,8 +254,13 @@ Website: {browse "https://github.com/lisa-george/exactnl"}
 {title:References}
 
 {phang}
-Baker and George. 2024. Nesting, crowding, and the identification of the
-nested-logit correlation parameter in Medicare Advantage. Working paper.
+Ackerberg, D. A., and M. Rysman. 2005. Unobserved product differentiation in
+discrete-choice models: Estimating price elasticities and welfare effects.
+{it:RAND Journal of Economics} 36: 771-788.
+
+{phang}
+Baker, M. J., and L. M. George. Demand estimation with variable choice sets:
+A likelihood correction for nested logit. Working paper.
 
 {phang}
 Berry, S. 1994. Estimating discrete-choice models of product differentiation.
@@ -258,7 +268,7 @@ Berry, S. 1994. Estimating discrete-choice models of product differentiation.
 
 {phang}
 Kodde, D. A., and F. C. Palm. 1986. Wald criteria for jointly testing equality
-and inequality restrictions. {it:Econometrica} 54: 1243-1248.
+and inequality restrictions. {it:Econometrica} 54: 1243-1246.
 
 {phang}
 Self, S. G., and K.-Y. Liang. 1987. Asymptotic properties of maximum likelihood
