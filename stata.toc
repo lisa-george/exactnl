@@ -1,5 +1,3 @@
 v 3
-d exactnl Stata package
-d
-d exactnl: Exact likelihood correction for nested logit share-form estimation
-p exactnl
+d lisa-george Stata packages
+p exactnl Exact maximum likelihood estimation of the share-form nested logit
