@@ -11,17 +11,21 @@ variable: observed shares are mapped to the log share-ratio
 ln(s_j) - ln(s_0) following Berry (1994). A likelihood written for the
 transformed variable must include the Jacobian of that transformation.  In
 the nested logit, the Jacobian depends on the choice set and the nesting
-parameter.  Each  nest of J products contributes (J - 1) * ln(1 - sigma) to
-the log likelihood.  Applied work omits this term. The omission has no effect
-when choice sets are fixed across markets.  But when choice sets vary, omitting the Jacobian 
-biases estimates of within-group substitution, which feed directly into
-elasticities, markups, and welfare calculations.
+parameter.  Each nest of J products contributes (J - 1) * ln(1 - sigma) to
+the log likelihood.  Applied work omits this term. Because the term depends
+on the nesting parameter, omitting it biases likelihood estimates of
+within-group substitution, which feed directly into elasticities, markups,
+and welfare calculations. The bias is entangled with product counts when
+choice sets vary across markets.
 
 Guides for structural demand estimation recommend instrumenting the
-within-nest share with counts of rival products. Under the exact
-likelihood, count instruments are not valid because the same product-count variation that makes them
-strong instruments enters the estimating objective directly. However with the corrected likelihood, instruments for the within-nest share are not needed because the dependence between the within-nest share and the structural
-error is exactly what the Jacobian accounts for.
+within-nest share with counts of rival products. Under the corrected
+likelihood such instruments are not needed: the dependence between the
+within-nest share and the structural error is exactly what the Jacobian
+accounts for. And when product counts enter demand directly, as when
+products crowd the product space, count instruments fail exclusion and are
+not valid. The corrected likelihood makes count instruments unnecessary;
+crowding makes them invalid.
 
 exactnl maximizes the exact likelihood. It concentrates the linear
 parameters out by fixed-effect partialling, profiles the likelihood over
