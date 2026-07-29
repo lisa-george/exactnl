@@ -40,7 +40,7 @@ results, and `exactnl_example.do` for worked examples.
 
 ## Requirements
 
-Stata 16 or later. Requires `reghdfe` and `ftools`:
+Stata 17 or later. Requires `reghdfe` and `ftools`:
 
     ssc install reghdfe
     ssc install ftools
