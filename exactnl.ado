@@ -53,11 +53,11 @@ program define exactnl, eclass
 
     * ---- options ----
     local 0 `", `opts'"'
-    syntax , NEST(varname) MARKET(varlist) ///
+syntax , NEST(varname) MARKET(varlist) ///
         [ SHARE(varname) OUTside(varname) WNShare(varname) ///
-          ABSORB(varlist) CROWding(string) SIGMA0(numlist) ///
+          ABSORB(varlist) CROWding(string) ///
           CLUSTER(varname) GRID(numlist) ///
-          BOOTstrap(integer 0) TOLerance(real 1e-8) ]
+          BOOTstrap(integer 0) ]
 
     * validate depvar
     confirm numeric variable `depvar'
