@@ -1,9 +1,10 @@
 {smcl}
-{* *! version 1.0.0  09jul2026  Baker & George}{...}
+{* *! version 1.0.0  29jul2026  Baker & George}{...}
 {vieweralsosee "reghdfe" "help reghdfe"}{...}
 {vieweralsosee "nlogit" "help nlogit"}{...}
 {viewerjumpto "Syntax" "exactnl##syntax"}{...}
 {viewerjumpto "Description" "exactnl##description"}{...}
+{viewerjumpto "Do not instrument the within-nest share" "exactnl##warning"}{...}
 {viewerjumpto "Options" "exactnl##options"}{...}
 {viewerjumpto "Stored results" "exactnl##results"}{...}
 {viewerjumpto "Examples" "exactnl##examples"}{...}
@@ -13,9 +14,9 @@
 {title:Title}
 
 {phang}
-{bf:exactnl} {hline 2} Exact maximum likelihood estimation of the share-form
-nested logit, with fixed-effect absorption and a control-function price
-instrument
+{bf:exactnl} {hline 2} Share-form nested logit by maximum likelihood with the
+exact change-of-variables correction, fixed-effect absorption, and a
+control-function price instrument
 
 {marker syntax}{...}
 {title:Syntax}
@@ -69,6 +70,11 @@ ln(s_j) - ln(s_0).  The parenthesised {cmd:(}{it:endogvar} {cmd:=} {it:instvars}
 group requests a control-function first stage for the (endogenous) price; omit it
 to treat all regressors as exogenous.
 
+{p 4 6 2}
+{cmd:exactnl} requires Stata 17 or later and {help reghdfe} (which in turn
+requires {cmd:ftools}).  Install both with {cmd:ssc install reghdfe} and
+{cmd:ssc install ftools}.
+
 {marker description}{...}
 {title:Description}
 
@@ -100,10 +106,10 @@ term) by one final FE regression at the optimum.
 {pstd}
 No instrument for the within-nest share is used.  Applied work commonly
 instruments ln s_(j|g) with counts of rival products in the nest; under the
-exact likelihood such instruments are not needed, because the dependence
-between the within-nest share and the structural error is exactly what the
-Jacobian accounts for, and they are not valid, because the same product-count
-variation that makes them strong enters the estimating objective directly.
+exact likelihood such instruments are not needed.  The dependence between the
+within-nest share and the structural error is exactly what the Jacobian
+accounts for.  They are also not valid: the same product-count variation that
+makes them strong enters the estimating objective directly.
 Because no share instrument is required, a product-count (crowding) term in
 mean utility can be estimated directly via {cmd:crowding()}, in the spirit of
 Ackerberg and Rysman (2005).
@@ -121,9 +127,34 @@ on sigma_g.  The command also reports the boundary likelihood-ratio test of
 H0: all sigma_g = 0 against the one-sided alternative.  The printed 5%
 critical value is the Kodde-Palm (1986) least-favourable upper bound (2.71 for
 G=1, 5.14 for G=2), which is valid regardless of the dependence among the
-sigma_g estimates; the exact chi-bar-squared mixture quantile (valid under
+sigma_g estimates; the exact chi-bar-squared mixture quantile (Self and Liang 1987; valid under
 independence of the sigma_g estimates) is stored in {cmd:e(LR_crit5_exact)}
 (see {help exactnl##results:Stored results}).
+
+{pstd}
+The Jacobian term is implied by the change of variables and holds for any
+absolutely continuous error density.  The implementation is Gaussian, so
+{cmd:exactnl} is exact maximum likelihood under normal structural errors and a
+quasi-maximum-likelihood estimator otherwise.  The point estimate of sigma_g is
+robust to heavy-tailed errors in simulation; the curvature-based standard
+errors are not.  Use {cmd:cluster()} and {cmd:bootstrap()} for inference.
+
+{marker warning}{...}
+{title:Do not instrument the within-nest share}
+
+{pstd}
+{bf:The Jacobian already accounts for the dependence between the within-nest
+share and the structural error.}  Supplying a within-share instrument or
+control function in addition to the correction applies the same adjustment
+twice and biases sigma_g downward.  The parenthesised
+{cmd:(}{it:endogvar} {cmd:=} {it:instvars}{cmd:)} group is for price only.
+Do not place ln s_(j|g) on the left of the equals sign, and do not include
+rival product counts among {it:instvars}.
+
+{pstd}
+Product counts may appear in mean utility through {cmd:crowding()}.  That is a
+regressor, not an instrument, and is the intended way to let nest size affect
+demand.
 
 {marker options}{...}
 {title:Options}
@@ -259,7 +290,7 @@ discrete-choice models: Estimating price elasticities and welfare effects.
 {it:RAND Journal of Economics} 36: 771-788.
 
 {phang}
-Baker, M. J., and L. M. George. Demand estimation with variable choice sets:
+Baker, M. J., and L. M. George. 2026. Demand estimation with variable choice sets:
 A likelihood correction for nested logit. Working paper.
 
 {phang}
