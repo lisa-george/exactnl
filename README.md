@@ -1,7 +1,8 @@
 # exactnl
 
 exactnl is a Stata command that estimates the share-form nested logit
-demand model by exact maximum likelihood.
+demand model by maximum likelihood, using the exact density of the
+transformed dependent variable.
 
 ## What it does
 
@@ -37,6 +38,13 @@ results, and `exactnl_example.do` for worked examples.
 
     net install exactnl, from(https://raw.githubusercontent.com/lisa-george/exactnl/main/)
 
+## Requirements
+
+Stata 16 or later. Requires `reghdfe` and `ftools`:
+
+    ssc install reghdfe
+    ssc install ftools
+    
 ## Verification
 
 `exactnl_cert_public.do` is a self-contained certification script. It
