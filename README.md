@@ -44,7 +44,24 @@ Stata 16 or later. Requires `reghdfe` and `ftools`:
 
     ssc install reghdfe
     ssc install ftools
-    
+
+## Syntax
+
+    exactnl depvar [indepvars] [(endogvar = instvars)], nest(varname) market(varlist) [options]
+
+`depvar` is the user-constructed dependent variable ln(s_j) - ln(s_0).
+Within-nest shares are supplied either as raw shares via `share()` and
+`outside()`, or precomputed via `wnshare()`.
+
+Two nests, county and year fixed effects, price instrumented by a cost
+shifter through a control function, a common crowding term, and clustered
+standard errors:
+
+    exactnl y x1 x2 (price = costshifter), nest(nestid) market(county year) ///
+        absorb(county year) share(s_j) outside(s_0) crowding("lnJ") cluster(county)
+
+See `help exactnl` for the full syntax, options, and stored results.
+
 ## Verification
 
 `exactnl_cert_public.do` is a self-contained certification script. It
