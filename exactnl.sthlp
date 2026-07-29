@@ -49,9 +49,7 @@ for data that do not carry raw shares{p_end}
 {synopt:{opt crow:ding(str)}}{cmd:lnJ} adds tau*ln(J_gm) to mean utility with a
 common tau; {cmd:lnJ, bynest} adds a nest-specific tau_g{p_end}
 {synopt:{opt noJAC:obian}}omit the Jacobian term (for comparison; prints a
-warning that sigma is biased upward when choice sets vary){p_end}
-{synopt:{opt sigma0(numlist)}}starting values for the golden-section refinement
-when G>=3 (default 0.2 per nest){p_end}
+warning that sigma is biased upward){p_end}
 
 {syntab:Inference}
 {synopt:{opth cluster(varname)}}cluster-robust (sandwich) SEs for the linear
@@ -87,10 +85,11 @@ transformed variable must include the Jacobian of that transformation, and in
 the nested logit the Jacobian depends on the choice set and the nesting
 parameter: each nest of J_gm products contributes
 {bf:(J_gm - 1) ln(1 - sigma_g)} to the log likelihood.  Applied work omits this
-term.  The omission has no effect when choice sets are fixed across markets,
-but when choice sets vary it biases estimates of within-group substitution.
-{cmd:exactnl} includes the term.  Concentrating the linear parameters out by
-fixed-effect partialling, the profile log likelihood is
+term.  Because the term depends on sigma_g, its omission biases likelihood
+estimates of within-group substitution; when choice sets vary across markets
+the bias is entangled with product counts.  {cmd:exactnl} includes the term.
+Concentrating the linear parameters out by fixed-effect partialling, the
+profile log likelihood is
 
 {p 8 8 2}
 LL(sigma) = -N/2 ln(SSR(sigma)/N) + sum_g [ sum_m (J_gm - 1) ] ln(1 - sigma_g),
@@ -108,10 +107,12 @@ No instrument for the within-nest share is used.  Applied work commonly
 instruments ln s_(j|g) with counts of rival products in the nest; under the
 exact likelihood such instruments are not needed.  The dependence between the
 within-nest share and the structural error is exactly what the Jacobian
-accounts for.  They are also not valid: the same product-count variation that
-makes them strong enters the estimating objective directly.
-Because no share instrument is required, a product-count (crowding) term in
-mean utility can be estimated directly via {cmd:crowding()}, in the spirit of
+accounts for.  When product counts also enter mean utility directly, as when
+products crowd the product space, count instruments fail the exclusion
+restriction and are not valid.  The corrected likelihood makes count
+instruments unnecessary; crowding makes them invalid.  Because no share
+instrument is required, a product-count (crowding) term in mean utility can be
+estimated directly via {cmd:crowding()}, in the spirit of
 Ackerberg and Rysman (2005).
 
 {pstd}
@@ -189,11 +190,8 @@ Exactly one of {cmd:wnshare()} or {cmd:share()}+{cmd:outside()} must be given.
 
 {phang}
 {opt noJACobian} drops the (J_gm-1)ln(1-sigma_g) term, reducing the objective to
-the Gaussian sum of squares.  When choice sets vary across markets the resulting
-sigma_g are biased upward; a warning is printed.
-
-{phang}
-{opt sigma0(numlist)} sets starting values for the G>=3 golden-section refinement.
+the Gaussian sum of squares.  The resulting sigma_g are biased upward; a
+warning is printed.
 
 {phang}
 {opth cluster(varname)} requests cluster-robust SEs for the linear parameters.
