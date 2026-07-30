@@ -6,18 +6,21 @@ d
 d exactnl estimates the share-form nested logit demand model by exact
 d maximum likelihood. The likelihood of the Berry (1994) log share-ratio
 d includes a Jacobian term, (J-1)ln(1-sigma) per nest, that applied work
-d omits. The omission has no effect when choice sets are fixed across
-d markets but biases within-group substitution estimates when choice sets
-d vary. exactnl includes the term, requires no instrument for the
-d within-nest share, and supports fixed-effect absorption, a
-d control-function price instrument, and a direct product-count
-d (crowding) term in mean utility.
+d omits. Because the term depends on the nesting parameter, omitting it
+d biases within-group substitution estimates, and the bias is entangled
+d with product counts when choice sets vary across markets. exactnl
+d includes the term, requires no instrument for the within-nest share, and
+d supports fixed-effect absorption, a control-function price instrument,
+d and a direct product-count (crowding) term in mean utility.
 d
 d If you use this command, please cite:
-d Baker, Matthew J. and Lisa M. George. Demand Estimation with Variable
-d Choice Sets: A Likelihood Correction for Nested Logit. Working paper.
+d Baker, Matthew J. and Lisa M. George. 2026. Demand Estimation with
+d Variable Choice Sets: A Likelihood Correction for Nested Logit.
+d SSRN Working Paper 7207278. https://ssrn.com/abstract=7207278
 d
-d Distribution-Date: 20260710
+d Distribution-Date: 20260730
 d
 f exactnl.ado
 f exactnl.sthlp
+f exactnl_example.do
+f exactnl_cert_public.do
