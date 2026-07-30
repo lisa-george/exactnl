@@ -68,7 +68,7 @@ exactnl y x (p = z), nest(nestid) market(mkt) share(s_j) outside(s_0) ///
 *==============================================================================
 * SECTION B -- full real-data syntax: the specification from the paper's
 * Medicare Advantage application (Baker and George 2026, SSRN Working Paper
-* 7207278, https://ssrn.com/abstract=7207278).
+* 7207938, https://ssrn.com/abstract=7207938).
 * Requires the paper's estimation sample; shown for syntax reference.
 * bootstrap(200) reproduces the county block-bootstrap standard errors the
 * paper reports for sigma_g and tau. It refits the full model 200 times and

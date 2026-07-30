@@ -289,8 +289,8 @@ discrete-choice models: Estimating price elasticities and welfare effects.
 
 {phang}
 Baker, M. J., and L. M. George. 2026. Demand estimation with variable choice sets:
-A likelihood correction for nested logit. SSRN Working Paper 7207278. Available at
-{browse "https://ssrn.com/abstract=7207278"}.
+A likelihood correction for nested logit. SSRN Working Paper 7207938. Available at
+{browse "https://ssrn.com/abstract=7207938"}.
 
 {phang}
 Berry, S. 1994. Estimating discrete-choice models of product differentiation.
