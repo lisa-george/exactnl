@@ -77,8 +77,8 @@ recovers the true nesting parameter. No confidential data required.
 If you use this command, please cite:
 
 Baker, Matthew J. and Lisa M. George. 2026. "Demand Estimation with Variable
-Choice Sets: A Likelihood Correction for Nested Logit." Working paper.
-[SSRN link]
+Choice Sets: A Likelihood Correction for Nested Logit." SSRN Working Paper
+7207278. [https://ssrn.com/abstract=7207278](https://ssrn.com/abstract=7207278)
 
 ## Issues
 
