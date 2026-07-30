@@ -59,7 +59,9 @@ exactnl y x (p = z), nest(nestid) market(mkt) share(s_j) outside(s_0) ///
     cluster(mkt) noJACobian
 
 *--- Example 3: add a common crowding term tau*ln(J_gm) -----------------------
-* The DGP has no crowding, so expect tau near 0 and sigma unchanged.
+* The DGP has no crowding, so expect tau small and sigma unchanged.
+* The displayed SE for tau treats sigma as fixed; since tau and sigma are
+* estimated jointly, use bootstrap() for inference on tau.
 exactnl y x (p = z), nest(nestid) market(mkt) share(s_j) outside(s_0) ///
     crowding("lnJ") cluster(mkt)
 
